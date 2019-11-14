@@ -6,17 +6,18 @@ const task = mongoCollections.task;
 
 getAllTask = async () => {
     taskCollection = await task();
-    return taskCollection.find({}).skip(skip).limit(take).toArray();
+    return taskCollection.find({}).toArray();
 };
 
 removeTask = async (id) => {
+    console.log(id);
     if(id === "") {
         return {};
     } else {
         taskCollection = await task();
         returnval = await getTaskById(id);
-        await taskCollection.remove({
-            id:id
+        await taskCollection.deleteOne({
+           id: id
         });
         return returnval;
     }
@@ -73,7 +74,7 @@ patchTask = async (suppliedId, newData) => {
         };
         const taskCollection = await task();
         await taskCollection.updateOne({
-            _id: ObjectId(suppliedId)
+            id: suppliedId
         }, newValues);
         return await getTaskById(suppliedId);
     }

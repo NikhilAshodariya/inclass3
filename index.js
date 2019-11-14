@@ -28,7 +28,7 @@ const typeDefs = gql`
             hoursEstimated: Int!
             completed: Boolean!
         ): Task
-        removeTask(id: String!): [Task]
+        removeTask(id: String!): Task
         editTask(
             id: String!
             title: String
@@ -79,34 +79,16 @@ const resolvers = {
                 hoursEstimated: args.hoursEstimated,
                 completed: args.completed
             };
-            returnval = await data.task.postTask(newEmployee);
+            returnval = await data.task.postTask(newTask);
 
             return returnval;
         },
-        removeTask: (_, args) => {
-            return data.task.removeTask(args.id)
+        removeTask: async (_, args) => {
+            return await data.task.removeTask(args.id);
+        },
+        editTask: (_, args) => {
+            return data.task.patchTask(args.id, args);
         }
-        // editEmployee: (_, args) => {
-        //     // let newEmployee;
-        //     //
-        //     // employees = employees.map(e => {
-        //     //     if (e.id === args.id) {
-        //     //         if (args.firstName) {
-        //     //             e.firstName = args.firstName;
-        //     //         }
-        //     //         if (args.lastName) {
-        //     //             e.lastName = args.lastName;
-        //     //         }
-        //     //         if (args.employerId) {
-        //     //             e.employerId = args.employerId;
-        //     //         }
-        //     //         newEmployee = e;
-        //     //         return e;
-        //     //     }
-        //     //     return e;
-        //     // });
-        //     return {};
-        // }
     }
 };
 
