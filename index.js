@@ -2,14 +2,10 @@ const { ApolloServer, gql } = require("apollo-server");
 
 const data = require("./data");
 
-//Create the type definitions for the query and our data
 const typeDefs = gql`
     type Query {
         tasks: [Task]
-#        employers: [Employer]
-#        employees: [Employee]
         task(id: String): Task
-#        employee(id: String): Employee
     }
 
     type Task {
@@ -39,37 +35,11 @@ const typeDefs = gql`
     }
 `;
 
-/* parentValue - References the type def that called it
-    so for example when we execute numOfEmployees we can reference
-    the parent's properties with the parentValue Paramater
-*/
-
-/* args - Used for passing any arguments in from the client
-    for example, when we call
-    addEmployee(firstName: String!, lastName: String!, employerId: Int!): Employee
-
-*/
-
 const resolvers = {
     Query: {
         tasks: (_, args) => data.task.getAllTask(),
         task: (_, args) => data.task.getTaskById(args.id),
     },
-    // Employer: {
-    //     numOfTasks: parentValue => {
-    //         console.log(`parentValue in Employer`, parentValue);
-    //         return employees.filter(e => e.employerId === parentValue.id).length;
-    //     },
-    //     employees: parentValue => {
-    //         return employees.filter(e => e.employerId === parentValue.id);
-    //     }
-    // },
-    // Task: {
-    //     task: parentValue => {
-    //         return employers.filter(e => e.id === parentValue.employerId)[0];
-    //     }
-    // },
-
     Mutation: {
         addTask: async (_, args) => {
             const newTask = {
