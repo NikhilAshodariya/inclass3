@@ -42,9 +42,33 @@ postTask = async (userData) => {
     // return the creadted object
 };
 
+patchTask = async (suppliedId, newData) => {
+    taskCollection = await task();
+    const data = await getTaskById(suppliedId);
+
+    if (data === null) {
+        return undefined;
+    } else {
+        const newValues = {
+            "$set": {
+                "title": newData.title ? newData.title : data.title,
+                "description": newData.description ? newData.description : data.description,
+                "hoursEstimated": newData.hoursEstimated ? newData.hoursEstimated : data.hoursEstimated,
+                "completed": newData.completed ? newData.completed : data.completed,
+            }
+        };
+        const taskCollection = await task();
+        await taskCollection.updateOne({
+            _id: ObjectId(suppliedId)
+        }, newValues);
+        return await getTaskById(suppliedId);
+    }
+};
+
 
 module.exports = {
     "getAllTask": getAllTask,
     "getTaskById": getTaskById,
-    "postTask": postTask
+    "postTask": postTask,
+    "patchTask": patchTask
 };
