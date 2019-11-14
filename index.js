@@ -28,8 +28,8 @@ const typeDefs = gql`
             hoursEstimated: Int!
             completed: Boolean!
         ): Task
-        removeEmployee(id: String!): [Task]
-        editEmployee(
+        removeTask(id: String!): [Task]
+        editTask(
             id: String!
             title: String
             description: String
@@ -85,28 +85,28 @@ const resolvers = {
         },
         removeTask: (_, args) => {
             return data.task.removeTask(args.id)
-        },
-        editEmployee: (_, args) => {
-            // let newEmployee;
-            //
-            // employees = employees.map(e => {
-            //     if (e.id === args.id) {
-            //         if (args.firstName) {
-            //             e.firstName = args.firstName;
-            //         }
-            //         if (args.lastName) {
-            //             e.lastName = args.lastName;
-            //         }
-            //         if (args.employerId) {
-            //             e.employerId = args.employerId;
-            //         }
-            //         newEmployee = e;
-            //         return e;
-            //     }
-            //     return e;
-            // });
-            return {};
         }
+        // editEmployee: (_, args) => {
+        //     // let newEmployee;
+        //     //
+        //     // employees = employees.map(e => {
+        //     //     if (e.id === args.id) {
+        //     //         if (args.firstName) {
+        //     //             e.firstName = args.firstName;
+        //     //         }
+        //     //         if (args.lastName) {
+        //     //             e.lastName = args.lastName;
+        //     //         }
+        //     //         if (args.employerId) {
+        //     //             e.employerId = args.employerId;
+        //     //         }
+        //     //         newEmployee = e;
+        //     //         return e;
+        //     //     }
+        //     //     return e;
+        //     // });
+        //     return {};
+        // }
     }
 };
 
