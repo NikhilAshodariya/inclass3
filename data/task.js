@@ -9,12 +9,25 @@ getAllTask = async () => {
     return taskCollection.find({}).skip(skip).limit(take).toArray();
 };
 
+removeTask = async (id) => {
+    if(id === "") {
+        return {};
+    } else {
+        taskCollection = await task();
+        returnval = await getTaskById(id);
+        await taskCollection.remove({
+            id:id
+        });
+        return returnval;
+    }
+};
+
 getTaskById = async (id) => {
     // we need to search for that id;
 
     taskCollection = await task();
     const data = await taskCollection.findOne({
-        _id: ObjectId.createFromHexString(id)
+        id: id
     });
 
     if (data === null) {
@@ -27,11 +40,11 @@ getTaskById = async (id) => {
 postTask = async (userData) => {
     taskCollection = await task();
     const insertInfo = await taskCollection.insertOne({
+        "id": userData.id,
         "title": userData.title,
         "description": userData.description,
         "hoursEstimated": userData.hoursEstimated,
-        "completed": userData.completed,
-        "comments": userData.comments
+        "completed": userData.completed
     });
 
     const {
@@ -51,6 +64,7 @@ patchTask = async (suppliedId, newData) => {
     } else {
         const newValues = {
             "$set": {
+                "id": newData.id? newData.id: data.id,
                 "title": newData.title ? newData.title : data.title,
                 "description": newData.description ? newData.description : data.description,
                 "hoursEstimated": newData.hoursEstimated ? newData.hoursEstimated : data.hoursEstimated,
@@ -70,5 +84,6 @@ module.exports = {
     "getAllTask": getAllTask,
     "getTaskById": getTaskById,
     "postTask": postTask,
-    "patchTask": patchTask
+    "patchTask": patchTask,
+    "removeTask": removeTask
 };

@@ -1,92 +1,41 @@
 const { ApolloServer, gql } = require("apollo-server");
-const lodash = require("lodash");
-const uuid = require("node-uuid");
-//some Mock data
-let employees = [
-    {
-        id: uuid.v4(),
-        firstName: "Patrick",
-        lastName: "Hill",
-        employerId: 1
-    },
-    {
-        id: uuid.v4(),
-        firstName: "Jimi",
-        lastName: "Hendrix",
-        employerId: 1
-    },
-    {
-        id: uuid.v4(),
-        firstName: "Jim",
-        lastName: "Morrison",
-        employerId: 2
-    },
-    {
-        id: uuid.v4(),
-        firstName: "Roger",
-        lastName: "Waters",
-        employerId: 1
-    },
-    {
-        id: uuid.v4(),
-        firstName: "John",
-        lastName: "Smith",
-        employerId: 2
-    }
-];
 
-let employers = [
-    {
-        id: 1,
-        name: "Stevens Institute of Technology"
-    },
-    {
-        id: 2,
-        name: "Google"
-    },
-    {
-        id: 3,
-        name: "Apple"
-    }
-];
+const data = require("./data");
 
 //Create the type definitions for the query and our data
 const typeDefs = gql`
     type Query {
-        employers: [Employer]
-        employees: [Employee]
-        employer(id: Int): Employer
-        employee(id: String): Employee
+        tasks: [Task]
+#        employers: [Employer]
+#        employees: [Employee]
+        task(id: String): Task
+#        employee(id: String): Employee
     }
 
-    type Employer {
-        id: Int
-        name: String
-        employees: [Employee]
-        numOfEmployees: Int
-    }
-
-    type Employee {
+    type Task {
         id: String
-        firstName: String
-        lastName: String
-        employer: Employer
+        title: String
+        description: String
+        hoursEstimated: Int,
+        completed: Boolean
     }
-
+    
     type Mutation {
-        addEmployee(
-            firstName: String!
-            lastName: String!
-            employerId: Int!
-        ): Employee
-        removeEmployee(id: String!): [Employee]
+        addTask(
+            id: String!
+            title: String!
+            description: String!
+            hoursEstimated: Int!
+            completed: Boolean!
+        ): Task
+        removeEmployee(id: String!): [Task]
         editEmployee(
             id: String!
-            firstName: String
-            lastName: String
-            employerId: Int
-        ): Employee
-        addEmployer(name: String!): Employer
+            title: String
+            description: String
+            hoursEstimated: Int
+            completed: Boolean
+        ): Task
     }
 `;
 
@@ -103,66 +52,60 @@ const typeDefs = gql`
 
 const resolvers = {
     Query: {
-        employer: (_, args) => employers.filter(e => e.id === args.id)[0],
-        employee: (_, args) => employees.filter(e => e.id === args.id)[0],
-        employers: () => employers,
-        employees: () => employees
+        tasks: (_, args) => data.task.getAllTask(),
+        task: (_, args) => data.task.getTaskById(args.id),
     },
-    Employer: {
-        numOfEmployees: parentValue => {
-            console.log(`parentValue in Employer`, parentValue);
-            return employees.filter(e => e.employerId === parentValue.id).length;
-        },
-        employees: parentValue => {
-            return employees.filter(e => e.employerId === parentValue.id);
-        }
-    },
-    Employee: {
-        employer: parentValue => {
-            return employers.filter(e => e.id === parentValue.employerId)[0];
-        }
-    },
+    // Employer: {
+    //     numOfTasks: parentValue => {
+    //         console.log(`parentValue in Employer`, parentValue);
+    //         return employees.filter(e => e.employerId === parentValue.id).length;
+    //     },
+    //     employees: parentValue => {
+    //         return employees.filter(e => e.employerId === parentValue.id);
+    //     }
+    // },
+    // Task: {
+    //     task: parentValue => {
+    //         return employers.filter(e => e.id === parentValue.employerId)[0];
+    //     }
+    // },
+
     Mutation: {
-        addEmployee: (_, args) => {
-            const newEmployee = {
-                id: uuid.v4(),
-                firstName: args.firstName,
-                lastName: args.lastName,
-                employerId: args.employerId
+        addTask: async (_, args) => {
+            const newTask = {
+                id: args.id,
+                title: args.title,
+                description: args.description,
+                hoursEstimated: args.hoursEstimated,
+                completed: args.completed
             };
-            employees.push(newEmployee);
-            return newEmployee;
+            returnval = await data.task.postTask(newEmployee);
+
+            return returnval;
         },
-        removeEmployee: (_, args) => {
-            return lodash.remove(employees, e => e.id == args.id);
+        removeTask: (_, args) => {
+            return data.task.removeTask(args.id)
         },
         editEmployee: (_, args) => {
-            let newEmployee;
-            employees = employees.map(e => {
-                if (e.id === args.id) {
-                    if (args.firstName) {
-                        e.firstName = args.firstName;
-                    }
-                    if (args.lastName) {
-                        e.lastName = args.lastName;
-                    }
-                    if (args.employerId) {
-                        e.employerId = args.employerId;
-                    }
-                    newEmployee = e;
-                    return e;
-                }
-                return e;
-            });
-            return newEmployee;
-        },
-        addEmployer: (_, args) => {
-            const newEmployer = {
-                id: employers.length + 1,
-                name: args.name
-            };
-            employers.push(newEmployer);
-            return newEmployer;
+            // let newEmployee;
+            //
+            // employees = employees.map(e => {
+            //     if (e.id === args.id) {
+            //         if (args.firstName) {
+            //             e.firstName = args.firstName;
+            //         }
+            //         if (args.lastName) {
+            //             e.lastName = args.lastName;
+            //         }
+            //         if (args.employerId) {
+            //             e.employerId = args.employerId;
+            //         }
+            //         newEmployee = e;
+            //         return e;
+            //     }
+            //     return e;
+            // });
+            return {};
         }
     }
 };
